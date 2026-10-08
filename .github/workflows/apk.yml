@@ -2,6 +2,8 @@ name: Construire l'APK
 on:
   push:
   workflow_dispatch:
+permissions:
+  contents: write
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -29,7 +31,11 @@ jobs:
       - run: npx cap sync android
       - run: chmod +x gradlew && ./gradlew assembleDebug
         working-directory: android
-      - uses: actions/upload-artifact@v4
-        with:
-          name: daara-gaye-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+      - name: Publier le lien de téléchargement
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          cp android/app/build/outputs/apk/debug/app-debug.apk Daara-Gaye.apk
+          gh release delete telechargement --cleanup-tag --yes || true
+          gh release create telechargement Daara-Gaye.apk --target ${{ github.sha }} --title "Daara Gaye - dernière version" --notes "Téléchargez Daara-Gaye.apk, puis ouvrez-le pour installer l'application."
