@@ -24,7 +24,7 @@ jobs:
           {"name":"daara-gaye","version":"1.0.0","private":true,"dependencies":{"@capacitor/android":"^6.1.2","@capacitor/core":"^6.1.2"},"devDependencies":{"@capacitor/cli":"^6.1.2"}}
           EOF
           cat > capacitor.config.json <<'EOF'
-          {"appId":"sn.daara.gaye","appName":"Daara Gaye","webDir":"www"}
+          {"appId":"sn.daara.gaye","appName":"Daara OTG","webDir":"www"}
           EOF
       - run: npm install
       - run: npx cap add android
@@ -38,4 +38,4 @@ jobs:
         run: |
           cp android/app/build/outputs/apk/debug/app-debug.apk Daara-Gaye.apk
           gh release delete telechargement --cleanup-tag --yes || true
-          gh release create telechargement Daara-Gaye.apk --target ${{ github.sha }} --title "Daara Gaye - dernière version" --notes "Téléchargez Daara-Gaye.apk, puis ouvrez-le pour installer l'application."
+          gh release create telechargement Daara-Gaye.apk --target ${{ github.sha }} --title "Daara OTG - dernière version" --notes "Téléchargez Daara-Gaye.apk, puis ouvrez-le pour installer l'application."
