@@ -1,0 +1,35 @@
+name: Construire l'APK
+on:
+  push:
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: Préparer le projet
+        run: |
+          mkdir -p www
+          cp index.html www/
+          cat > package.json <<'EOF'
+          {"name":"daara-gaye","version":"1.0.0","private":true,"dependencies":{"@capacitor/android":"^6.1.2","@capacitor/core":"^6.1.2"},"devDependencies":{"@capacitor/cli":"^6.1.2"}}
+          EOF
+          cat > capacitor.config.json <<'EOF'
+          {"appId":"sn.daara.gaye","appName":"Daara Gaye","webDir":"www"}
+          EOF
+      - run: npm install
+      - run: npx cap add android
+      - run: npx cap sync android
+      - run: chmod +x gradlew && ./gradlew assembleDebug
+        working-directory: android
+      - uses: actions/upload-artifact@v4
+        with:
+          name: daara-gaye-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
