@@ -21,13 +21,17 @@ jobs:
           mkdir -p www
           cp index.html www/
           cat > package.json <<'EOF'
-          {"name":"daara-gaye","version":"1.0.0","private":true,"dependencies":{"@capacitor/android":"^6.1.2","@capacitor/core":"^6.1.2"},"devDependencies":{"@capacitor/cli":"^6.1.2"}}
+          {"name":"daara-otg","version":"1.0.0","private":true,"dependencies":{"@capacitor/android":"^6.1.2","@capacitor/core":"^6.1.2"},"devDependencies":{"@capacitor/cli":"^6.1.2"}}
           EOF
           cat > capacitor.config.json <<'EOF'
           {"appId":"sn.daara.gaye","appName":"Daara OTG","webDir":"www"}
           EOF
       - run: npm install
       - run: npx cap add android
+      - name: Forcer le nom de l'application
+        run: |
+          sed -i 's|<string name="app_name">[^<]*</string>|<string name="app_name">Daara OTG</string>|; s|<string name="title_activity_main">[^<]*</string>|<string name="title_activity_main">Daara OTG</string>|' android/app/src/main/res/values/strings.xml
+          cat android/app/src/main/res/values/strings.xml
       - run: npx cap sync android
       - run: chmod +x gradlew && ./gradlew assembleDebug
         working-directory: android
@@ -36,6 +40,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
         run: |
-          cp android/app/build/outputs/apk/debug/app-debug.apk Daara-Gaye.apk
+          cp android/app/build/outputs/apk/debug/app-debug.apk Daara-OTG.apk
           gh release delete telechargement --cleanup-tag --yes || true
-          gh release create telechargement Daara-Gaye.apk --target ${{ github.sha }} --title "Daara OTG - dernière version" --notes "Téléchargez Daara-Gaye.apk, puis ouvrez-le pour installer l'application."
+          gh release create telechargement Daara-OTG.apk --target ${{ github.sha }} --title "Daara OTG - dernière version" --notes "Téléchargez Daara-OTG.apk, puis ouvrez-le pour installer l'application."
