@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FFD400">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Gestion de l'école</title>
+<style>
+/* ===== Thème jaune et noir ===== */
+:root{
+  --bg:#FFF1A8; --card:#FFFFFF; --ink:#141200; --muted:#5f5a2e;
+  --accent:#FFD400; --accent-ink:#141200; --btn:#141200; --btn-ink:#FFD400;
+  --line:#141200; --danger:#B3261E; --shadow:4px 4px 0 #141200;
+}
+:root[data-theme="dark"]{
+  --bg:#0E0D00; --card:#1B1900; --ink:#FFF6C2; --muted:#c9bd6a;
+  --accent:#FFD400; --accent-ink:#141200; --btn:#FFD400; --btn-ink:#141200;
+  --line:#FFD400; --danger:#FF7B72; --shadow:4px 4px 0 #FFD400;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  padding-top:env(safe-area-inset-top);min-height:100vh}
+h1,h2,h3{margin:0;line-height:1.15}
+header.top{background:var(--accent);color:var(--accent-ink);border-bottom:3px solid var(--line);
+  padding:14px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:5}
+header.top .logo{font-size:26px}
+header.top h1{font-size:19px;font-weight:900}
+main{max-width:900px;margin:0 auto;padding:16px 14px 110px}
+.view-title{font-size:24px;font-weight:900;margin:6px 0 14px}
+/* Navigation : barre basse sur téléphone, latérale sur grand écran */
+nav.bar{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--btn);display:flex;
+  padding-bottom:env(safe-area-inset-bottom);border-top:3px solid var(--accent)}
+nav.bar button{flex:1;background:none;border:0;color:var(--btn-ink);padding:9px 2px 8px;font:inherit;
+  font-size:11px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:2px;opacity:.7;cursor:pointer}
+nav.bar button span{font-size:22px}
+nav.bar button.on{opacity:1;background:var(--accent);color:var(--accent-ink)}
+:root[data-theme="dark"] nav.bar{background:#000}
+:root[data-theme="dark"] nav.bar button{color:var(--accent)}
+:root[data-theme="dark"] nav.bar button.on{color:var(--accent-ink)}
+@media(min-width:760px){
+  nav.bar{top:0;bottom:auto;right:auto;width:96px;flex-direction:column;border-top:0;border-right:3px solid var(--accent);padding-top:70px}
+  nav.bar button{flex:0;padding:14px 2px}
+  main,header.top{margin-left:96px;max-width:none}
+  main{padding:20px 28px 40px;max-width:980px}
+  header.top{position:sticky}
+}
+/* Cartes */
+.card{background:var(--card);border:2.5px solid var(--line);border-radius:12px;padding:14px;box-shadow:var(--shadow)}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+.stats{display:grid;gap:12px;grid-template-columns:repeat(3,1fr);margin-bottom:18px}
+.stat{text-align:center;padding:12px 6px}
+.stat b{display:block;font-size:34px;font-weight:900}
+.stat small{font-weight:700;color:var(--muted)}
+.hero{background:var(--btn);color:var(--btn-ink);border:2.5px solid var(--line);border-radius:12px;padding:20px 16px;margin-bottom:16px;box-shadow:var(--shadow)}
+.hero{position:relative;overflow:hidden;text-align:center;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44'%3E%3Cg fill='none' stroke='%23FFD400' stroke-opacity='.28' stroke-width='1.5'%3E%3Crect x='11' y='11' width='22' height='22'/%3E%3Crect x='11' y='11' width='22' height='22' transform='rotate(45 22 22)'/%3E%3C/g%3E%3C/svg%3E")}
+:root[data-theme="dark"] .hero{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44'%3E%3Cg fill='none' stroke='%23141200' stroke-opacity='.25' stroke-width='1.5'%3E%3Crect x='11' y='11' width='22' height='22'/%3E%3Crect x='11' y='11' width='22' height='22' transform='rotate(45 22 22)'/%3E%3C/g%3E%3C/svg%3E")}
+.hero small{opacity:.9;font-weight:700;display:block}
+.bism{font-size:25px;font-weight:700;line-height:1.6;margin-bottom:4px}
+.salam{font-weight:800;margin:0 0 4px}
+.dua{text-align:center;color:var(--muted);font-weight:700;margin:22px 0 0;line-height:1.7}
+.dua span{display:block;font-size:20px;color:var(--ink)}
+.hero h2{font-size:26px;font-weight:900;margin-top:4px}
+.quick{display:grid;gap:12px;grid-template-columns:1fr 1fr}
+.quick button{font-size:17px;padding:18px 8px}
+/* Listes */
+.list{display:flex;flex-direction:column;gap:10px}
+.row{display:flex;align-items:center;gap:12px;background:var(--card);border:2.5px solid var(--line);border-radius:12px;padding:12px;cursor:pointer}
+.row:active{transform:translate(2px,2px)}
+.avatar{flex:none;width:44px;height:44px;border-radius:50%;background:var(--accent);color:var(--accent-ink);
+  border:2.5px solid var(--line);display:grid;place-items:center;font-weight:900;font-size:17px}
+.row .info{flex:1;min-width:0}
+.row .info b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .info small{color:var(--muted);font-weight:600}
+.tag{display:inline-block;background:var(--accent);color:var(--accent-ink);border:2px solid var(--line);border-radius:99px;padding:1px 10px;font-size:13px;font-weight:800}
+.demo{font-size:11px;font-weight:800;color:var(--muted);border:1.5px dashed var(--muted);border-radius:6px;padding:0 5px;margin-left:6px}
+/* Boutons */
+.btn{font:inherit;font-weight:800;border:2.5px solid var(--line);border-radius:10px;padding:12px 16px;cursor:pointer;
+  background:var(--btn);color:var(--btn-ink);min-height:48px}
+.btn.alt{background:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:var(--card);color:var(--ink)}
+.btn.danger{background:var(--danger);color:#fff;border-color:var(--danger)}
+.btn:active{transform:translate(2px,2px)}
+.call{flex:none;width:48px;height:48px;border-radius:50%;display:grid;place-items:center;text-decoration:none;font-size:22px;
+  background:var(--accent);color:var(--accent-ink);border:2.5px solid var(--line)}
+.call.off{opacity:.35;pointer-events:none}
+.bar-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.bar-actions .btn{flex:1 1 auto}
+.back{margin-bottom:12px}
+/* Recherche et formulaires */
+.search{width:100%;margin-bottom:14px}
+input,select{font:inherit;width:100%;padding:12px;border:2.5px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);min-height:48px}
+input:focus,select:focus,.btn:focus-visible,.row:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+label{display:block;font-weight:800;font-size:14px;margin:12px 0 4px}
+fieldset{border:2.5px solid var(--line);border-radius:12px;margin:14px 0;padding:4px 12px 14px}
+legend{font-weight:900;padding:0 8px;background:var(--accent);color:var(--accent-ink);border:2px solid var(--line);border-radius:8px}
+.two{display:grid;gap:10px;grid-template-columns:1fr 1fr}
+@media(max-width:420px){.two{grid-template-columns:1fr}}
+/* Fiche */
+.kv{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1.5px dashed var(--muted)}
+.kv:last-child{border:0}.kv span{color:var(--muted);font-weight:700}.kv b{text-align:right}
+.parent{display:flex;align-items:center;gap:12px}
+.parent .info{flex:1}
+h3.sec{font-size:17px;margin:18px 0 8px}
+.empty{text-align:center;padding:30px 10px;color:var(--muted);font-weight:700}
+/* Fenêtres modales et notification */
+.modal{position:fixed;inset:0;z-index:20;background:rgba(0,0,0,.65);display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--bg);width:100%;max-width:560px;max-height:92vh;overflow:auto;border:3px solid var(--line);
+  border-radius:18px 18px 0 0;padding:16px 16px calc(20px + env(safe-area-inset-bottom))}
+@media(min-width:760px){.modal{align-items:center}.sheet{border-radius:18px}}
+.sheet h2{font-size:21px;margin-bottom:6px}
+.sheet .actions{display:flex;gap:10px;margin-top:16px}.sheet .actions .btn{flex:1}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--btn);color:var(--btn-ink);
+  border:2.5px solid var(--line);padding:10px 18px;border-radius:99px;font-weight:800;z-index:30}
+.switch{display:flex;gap:10px}.switch .btn{flex:1}
+.switch .btn.on{background:var(--accent);color:var(--accent-ink)}
+@media(prefers-reduced-motion:no-preference){.sheet{animation:up .18s ease-out}@keyframes up{from{transform:translateY(30px);opacity:0}}}
+</style>
+</head>
+<body>
+<header class="top"><span class="logo">🕌</span><h1 id="hName"></h1></header>
+<main id="app"></main>
+<nav class="bar" id="nav"></nav>
+<div id="layer"></div>
+
+<script>
+/* ===================================================
+   Gestion d'école coranique — fichier unique
+   Données : localStorage (clé « ecole_v1 »)
+   =================================================== */
+const KEY = 'ecole_v1';
+const $ = s => document.querySelector(s);
+const esc = t => String(t ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+
+/* ---------- Données d'exemple (clairement fictives) ---------- */
+function seed() {
+  const c = [['c1','Groupe A — Débutants'],['c2','Groupe B — Intermédiaires'],['c3','Groupe C — Avancés']]
+    .map(([id, name]) => ({ id, name, demo: true }));
+  const s = (n, p, bn, ent, cl, pere, tp, mere, tm) => ({ id: uid(), nom: n, prenom: p, naissance: bn, entree: ent,
+    classId: cl, pere, telPere: tp, mere, telMere: tm, demo: true });
+  return {
+    school: 'DAARA OUSTAZE THIERNO GAYE', founded: '1983', director: 'Alioune Harraazim Gaye',
+    theme: 'light',
+    classes: c,
+    students: [
+      s('EXEMPLE','Élève Un','2015-03-12','2023-10-02','c1','Père Exemple Un','+221 77 000 00 01','Mère Exemple Un','+221 77 000 00 02'),
+      s('EXEMPLE','Élève Deux','2013-07-25','2022-10-03','c2','Père Exemple Deux','+221 77 000 00 03','Mère Exemple Deux','+221 77 000 00 04'),
+      s('FICTIF','Élève Trois','2011-11-02','2021-10-04','c3','Père Fictif Trois','+221 77 000 00 05','Mère Fictive Trois','+221 77 000 00 06'),
+      s('FICTIF','Élève Quatre','2016-01-18','2024-10-07','c1','Père Fictif Quatre','+221 77 000 00 07','Mère Fictive Quatre','+221 77 000 00 08')
+    ],
+    teachers: [
+      { id: uid(), nom: 'ENSEIGNANT', prenom: 'Exemple A', tel: '+221 77 000 01 01', classId: 'c1', demo: true },
+      { id: uid(), nom: 'ENSEIGNANT', prenom: 'Exemple B', tel: '+221 77 000 01 02', classId: 'c2', demo: true }
+    ]
+  };
+}
+let db = load();
+function load() {
+  try { const d = JSON.parse(localStorage.getItem(KEY)); if (d && d.students) { if (d.school === 'École Coranique Exemple') d.school = 'DAARA OUSTAZE THIERNO GAYE'; d.founded = d.founded || '1983'; d.director = d.director || 'Alioune Harraazim Gaye'; return d; } } catch (e) {}
+  const d = seed(); localStorage.setItem(KEY, JSON.stringify(d)); return d;
+}
+function save() { try { localStorage.setItem(KEY, JSON.stringify(db)); } catch (e) { toast('⚠️ Enregistrement impossible'); } }
+
+/* ---------- Utilitaires ---------- */
+const className = id => (db.classes.find(c => c.id === id) || {}).name || 'Sans classe';
+const tel = n => String(n || '').replace(/[^\d+]/g, '');
+const fmtDate = d => d ? new Date(d + 'T00:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : '—';
+const initials = (a, b) => ((b || '')[0] || '') + ((a || '')[0] || '');
+const callBtn = n => `<a class="call ${tel(n) ? '' : 'off'}" href="tel:${esc(tel(n))}" aria-label="Appeler" onclick="event.stopPropagation()">📞</a>`;
+const demoTag = o => o.demo ? '<span class="demo">exemple</span>' : '';
+function toast(msg) {
+  const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2200);
+}
+function applyTheme() {
+  document.documentElement.dataset.theme = db.theme;
+  document.querySelector('meta[name=theme-color]').content = db.theme === 'dark' ? '#0E0D00' : '#FFD400';
+  $('#hName').textContent = db.school;
+  document.title = db.school;
+}
+
+/* ---------- Fenêtres modales ---------- */
+function openSheet(html) {
+  $('#layer').innerHTML = `<div class="modal" onclick="if(event.target===this)closeSheet()"><div class="sheet" role="dialog">${html}</div></div>`;
+}
+function closeSheet() { $('#layer').innerHTML = ''; }
+function confirmBox(msg, onYes, label = 'Supprimer') {
+  openSheet(`<h2>Confirmation</h2><p>${msg}</p><div class="actions">
+    <button class="btn ghost" onclick="closeSheet()">Annuler</button>
+    <button class="btn danger" id="yes">${label}</button></div>`);
+  $('#yes').onclick = () => { closeSheet(); onYes(); };
+}
+
+/* ---------- Navigation (sans rechargement) ---------- */
+const TABS = [['home','🏠','Accueil'],['students','👨‍🎓','Élèves'],['classes','🏫','Classes'],['teachers','👨‍🏫','Enseignants'],['settings','⚙️','Réglages']];
+let view = 'home', param = null;
+function go(v, p = null) { view = v; param = p; render(); window.scrollTo(0, 0); }
+function render() {
+  applyTheme();
+  const tab = view === 'student' ? 'students' : view === 'class' ? 'classes' : view;
+  $('#nav').innerHTML = TABS.map(([k, i, l]) => `<button class="${k === tab ? 'on' : ''}" onclick="go('${k}')"><span>${i}</span>${l}</button>`).join('');
+  $('#app').innerHTML = ({ home: vHome, students: vStudents, student: vStudent, classes: vClasses, class: vClass, teachers: vTeachers, settings: vSettings })[view]();
+  if (view === 'students') filterStudents();
+}
+
+/* ---------- Accueil ---------- */
+function vHome() {
+  return `<div class="hero"><div class="bism" lang="ar" dir="rtl">بسم الله الرحمن الرحيم</div>
+    <small>Assalamou alaykoum, bienvenue au</small><h2>☪ ${esc(db.school)}</h2>
+    <small style="margin-top:8px">Fondé en ${esc(db.founded)}</small>
+    <small>Directeur : ${esc(db.director)}</small></div>
+  <div class="stats">
+    <div class="card stat"><b>${db.students.length}</b><small>Élèves</small></div>
+    <div class="card stat"><b>${db.classes.length}</b><small>Classes</small></div>
+    <div class="card stat"><b>${db.teachers.length}</b><small>Enseignants</small></div>
+  </div>
+  <div class="quick">
+    <button class="btn" onclick="go('students')">👨‍🎓 Élèves</button>
+    <button class="btn" onclick="go('classes')">🏫 Classes</button>
+    <button class="btn" onclick="go('teachers')">👨‍🏫 Enseignants</button>
+    <button class="btn alt" onclick="go('settings')">⚙️ Paramètres</button>
+  </div>
+  <p class="dua"><span lang="ar" dir="rtl">رَبِّ زِدْنِي عِلْمًا</span>« Seigneur, augmente mes connaissances »</p>`;
+}
+
+/* ---------- Élèves ---------- */
+function vStudents() {
+  return `<h2 class="view-title">Élèves</h2>
+  <div class="bar-actions"><button class="btn alt" onclick="studentForm()">+ Ajouter un élève</button></div>
+  <input class="search" id="q" type="search" placeholder="🔍 Rechercher : nom, prénom, classe" oninput="filterStudents()" value="${esc(window._q || '')}">
+  <div class="list" id="sList"></div>`;
+}
+function studentRow(s) {
+  return `<div class="row" tabindex="0" onclick="go('student','${s.id}')">
+    <div class="avatar">${esc(initials(s.nom, s.prenom)).toUpperCase()}</div>
+    <div class="info"><b>${esc(s.prenom)} ${esc(s.nom)}${demoTag(s)}</b><small>${esc(className(s.classId))}</small></div><span>›</span></div>`;
+}
+function filterStudents() {
+  const box = $('#q'), list = $('#sList'); if (!box || !list) return;
+  window._q = box.value;
+  const q = box.value.trim().toLowerCase();
+  const res = db.students.filter(s => !q || [s.nom, s.prenom, className(s.classId)].join(' ').toLowerCase().includes(q))
+    .sort((a, b) => (a.nom + a.prenom).localeCompare(b.nom + b.prenom, 'fr'));
+  list.innerHTML = res.length ? res.map(studentRow).join('') : '<div class="empty">Aucun élève trouvé.</div>';
+}
+function classOptions(sel) {
+  return '<option value="">— Sans classe —</option>' + db.classes.map(c => `<option value="${c.id}" ${c.id === sel ? 'selected' : ''}>${esc(c.name)}</option>`).join('');
+}
+function studentForm(id) {
+  const s = db.students.find(x => x.id === id) || {};
+  openSheet(`<h2>${id ? 'Modifier l\'élève' : 'Nouvel élève'}</h2>
+  <fieldset><legend>Élève</legend>
+    <div class="two"><div><label>Nom</label><input id="f_nom" value="${esc(s.nom)}"></div>
+    <div><label>Prénom</label><input id="f_prenom" value="${esc(s.prenom)}"></div></div>
+    <div class="two"><div><label>Date de naissance</label><input id="f_naissance" type="date" value="${esc(s.naissance)}"></div>
+    <div><label>Date d'entrée</label><input id="f_entree" type="date" value="${esc(s.entree)}"></div></div>
+    <label>Classe</label><select id="f_classId">${classOptions(s.classId)}</select></fieldset>
+  <fieldset><legend>Père</legend>
+    <label>Nom et prénom</label><input id="f_pere" value="${esc(s.pere)}">
+    <label>Téléphone</label><input id="f_telPere" type="tel" inputmode="tel" placeholder="+221 77 000 00 00" value="${esc(s.telPere)}"></fieldset>
+  <fieldset><legend>Mère</legend>
+    <label>Nom et prénom</label><input id="f_mere" value="${esc(s.mere)}">
+    <label>Téléphone</label><input id="f_telMere" type="tel" inputmode="tel" placeholder="+221 77 000 00 00" value="${esc(s.telMere)}"></fieldset>
+  <div class="actions"><button class="btn ghost" onclick="closeSheet()">Annuler</button>
+  <button class="btn alt" onclick="saveStudent('${id || ''}')">Enregistrer</button></div>`);
+}
+function saveStudent(id) {
+  const g = k => $('#f_' + k).value.trim();
+  if (!g('nom') || !g('prenom')) return toast('⚠️ Nom et prénom requis');
+  const data = { nom: g('nom'), prenom: g('prenom'), naissance: g('naissance'), entree: g('entree'), classId: g('classId'),
+    pere: g('pere'), telPere: g('telPere'), mere: g('mere'), telMere: g('telMere') };
+  if (id) Object.assign(db.students.find(s => s.id === id), data);
+  else db.students.push({ id: uid(), ...data });
+  save(); closeSheet(); toast('✅ Enregistré');
+  id ? go('student', id) : go('students');
+}
+function vStudent() {
+  const s = db.students.find(x => x.id === param); if (!s) return vStudents();
+  const parent = (t, n, p) => `<h3 class="sec">${t}</h3><div class="card parent"><div class="info"><b>${esc(n) || '—'}</b><br><small>${esc(p) || 'Numéro non renseigné'}</small></div>${callBtn(p)}</div>`;
+  return `<button class="btn ghost back" onclick="go('students')">← Retour</button>
+  <div class="row" style="cursor:default"><div class="avatar">${esc(initials(s.nom, s.prenom)).toUpperCase()}</div>
+    <div class="info"><b style="white-space:normal">${esc(s.prenom)} ${esc(s.nom)}</b><span class="tag">${esc(className(s.classId))}</span></div></div>
+  <h3 class="sec">Élève</h3><div class="card">
+    <div class="kv"><span>Nom</span><b>${esc(s.nom)}</b></div><div class="kv"><span>Prénom</span><b>${esc(s.prenom)}</b></div>
+    <div class="kv"><span>Naissance</span><b>${fmtDate(s.naissance)}</b></div><div class="kv"><span>Entrée</span><b>${fmtDate(s.entree)}</b></div>
+    <div class="kv"><span>Classe</span><b>${esc(className(s.classId))}</b></div></div>
+  ${parent('Père', s.pere, s.telPere)}${parent('Mère', s.mere, s.telMere)}
+  <div class="bar-actions" style="margin-top:18px"><button class="btn alt" onclick="studentForm('${s.id}')">✏️ Modifier</button>
+  <button class="btn danger" onclick="delStudent('${s.id}')">🗑️ Supprimer</button></div>`;
+}
+function delStudent(id) {
+  const s = db.students.find(x => x.id === id);
+  confirmBox(`Supprimer définitivement la fiche de <b>${esc(s.prenom)} ${esc(s.nom)}</b> ?`, () => {
+    db.students = db.students.filter(x => x.id !== id); save(); toast('🗑️ Élève supprimé'); go('students');
+  });
+}
+
+/* ---------- Classes ---------- */
+function vClasses() {
+  const rows = db.classes.map(c => {
+    const n = db.students.filter(s => s.classId === c.id).length;
+    return `<div class="row" tabindex="0" onclick="go('class','${c.id}')"><div class="avatar">🏫</div>
+      <div class="info"><b>${esc(c.name)}${demoTag(c)}</b><small>${n} élève${n > 1 ? 's' : ''}</small></div><span>›</span></div>`;
+  }).join('');
+  return `<h2 class="view-title">Classes</h2><div class="bar-actions"><button class="btn alt" onclick="classForm()">+ Ajouter une classe</button></div>
+  <div class="list">${rows || '<div class="empty">Aucune classe. Ajoutez-en une.</div>'}</div>`;
+}
+function classForm(id) {
+  const c = db.classes.find(x => x.id === id) || {};
+  openSheet(`<h2>${id ? 'Modifier la classe' : 'Nouvelle classe'}</h2><label>Nom de la classe</label>
+  <input id="c_name" value="${esc(c.name)}" placeholder="Ex. Groupe D">
+  <div class="actions"><button class="btn ghost" onclick="closeSheet()">Annuler</button><button class="btn alt" onclick="saveClass('${id || ''}')">Enregistrer</button></div>`);
+}
+function saveClass(id) {
+  const name = $('#c_name').value.trim(); if (!name) return toast('⚠️ Nom requis');
+  if (id) db.classes.find(c => c.id === id).name = name; else db.classes.push({ id: uid(), name });
+  save(); closeSheet(); toast('✅ Enregistré'); id ? go('class', id) : go('classes');
+}
+function vClass() {
+  const c = db.classes.find(x => x.id === param); if (!c) return vClasses();
+  const st = db.students.filter(s => s.classId === c.id);
+  const te = db.teachers.filter(t => t.classId === c.id);
+  return `<button class="btn ghost back" onclick="go('classes')">← Retour</button>
+  <h2 class="view-title">${esc(c.name)}</h2>
+  <div class="bar-actions"><button class="btn alt" onclick="classForm('${c.id}')">✏️ Modifier</button><button class="btn danger" onclick="delClass('${c.id}')">🗑️ Supprimer</button></div>
+  ${te.length ? `<p><b>Enseignant${te.length > 1 ? 's' : ''} :</b> ${te.map(t => esc(t.prenom + ' ' + t.nom)).join(', ')}</p>` : ''}
+  <h3 class="sec">${st.length} élève${st.length > 1 ? 's' : ''}</h3>
+  <div class="list">${st.map(studentRow).join('') || '<div class="empty">Aucun élève dans cette classe.</div>'}</div>`;
+}
+function delClass(id) {
+  const n = db.students.filter(s => s.classId === id).length;
+  confirmBox(`Supprimer cette classe ?${n ? ` Ses ${n} élève(s) ne seront pas supprimés, mais n'auront plus de classe.` : ''}`, () => {
+    db.classes = db.classes.filter(c => c.id !== id);
+    db.students.forEach(s => { if (s.classId === id) s.classId = ''; });
+    db.teachers.forEach(t => { if (t.classId === id) t.classId = ''; });
+    save(); toast('🗑️ Classe supprimée'); go('classes');
+  });
+}
+
+/* ---------- Enseignants ---------- */
+function vTeachers() {
+  const rows = db.teachers.map(t => `<div class="row" onclick="teacherForm('${t.id}')"><div class="avatar">${esc(initials(t.nom, t.prenom)).toUpperCase()}</div>
+    <div class="info"><b>${esc(t.prenom)} ${esc(t.nom)}${demoTag(t)}</b><small>${esc(className(t.classId))} · ${esc(t.tel) || 'sans numéro'}</small></div>${callBtn(t.tel)}</div>`).join('');
+  return `<h2 class="view-title">Enseignants</h2><div class="bar-actions"><button class="btn alt" onclick="teacherForm()">+ Ajouter un enseignant</button></div>
+  <p style="color:var(--muted);margin-top:0">Touchez un enseignant pour le modifier.</p>
+  <div class="list">${rows || '<div class="empty">Aucun enseignant.</div>'}</div>`;
+}
+function teacherForm(id) {
+  const t = db.teachers.find(x => x.id === id) || {};
+  openSheet(`<h2>${id ? 'Modifier l\'enseignant' : 'Nouvel enseignant'}</h2>
+  <div class="two"><div><label>Nom</label><input id="t_nom" value="${esc(t.nom)}"></div><div><label>Prénom</label><input id="t_prenom" value="${esc(t.prenom)}"></div></div>
+  <label>Téléphone</label><input id="t_tel" type="tel" inputmode="tel" placeholder="+221 77 000 00 00" value="${esc(t.tel)}">
+  <label>Classe</label><select id="t_classId">${classOptions(t.classId)}</select>
+  <div class="actions"><button class="btn ghost" onclick="closeSheet()">Annuler</button><button class="btn alt" onclick="saveTeacher('${id || ''}')">Enregistrer</button></div>
+  ${id ? `<div class="actions"><button class="btn danger" onclick="delTeacher('${id}')">🗑️ Supprimer</button></div>` : ''}`);
+}
+function saveTeacher(id) {
+  const g = k => $('#t_' + k).value.trim();
+  if (!g('nom') || !g('prenom')) return toast('⚠️ Nom et prénom requis');
+  const data = { nom: g('nom'), prenom: g('prenom'), tel: g('tel'), classId: g('classId') };
+  if (id) Object.assign(db.teachers.find(t => t.id === id), data); else db.teachers.push({ id: uid(), ...data });
+  save(); closeSheet(); toast('✅ Enregistré'); go('teachers');
+}
+function delTeacher(id) {
+  const t = db.teachers.find(x => x.id === id);
+  confirmBox(`Supprimer <b>${esc(t.prenom)} ${esc(t.nom)}</b> ?`, () => {
+    db.teachers = db.teachers.filter(x => x.id !== id); save(); toast('🗑️ Enseignant supprimé'); go('teachers');
+  });
+}
+
+/* ---------- Paramètres ---------- */
+function vSettings() {
+  return `<h2 class="view-title">Paramètres</h2>
+  <div class="card"><label style="margin-top:0">Nom de l'école</label>
+    <input id="s_name" value="${esc(db.school)}">
+    <label>Directeur</label><input id="s_dir" value="${esc(db.director)}">
+    <label>Année de création</label><input id="s_year" inputmode="numeric" maxlength="4" value="${esc(db.founded)}">
+    <button class="btn alt" style="margin-top:12px;width:100%" onclick="saveName()">Enregistrer</button></div>
+  <h3 class="sec">Apparence</h3>
+  <div class="switch"><button class="btn ${db.theme === 'light' ? 'on' : 'ghost'}" onclick="setTheme('light')">☀️ Clair</button>
+  <button class="btn ${db.theme === 'dark' ? 'on' : 'ghost'}" onclick="setTheme('dark')">🌙 Sombre</button></div>
+  <h3 class="sec">Données</h3>
+  <div class="list">
+    <button class="btn ghost" onclick="clearDemo()">🧹 Supprimer les données de démonstration</button>
+    <button class="btn danger" onclick="resetAll()">♻️ Réinitialiser l'application</button></div>
+  <p style="color:var(--muted)">Les données sont conservées dans ce navigateur, sur cet appareil uniquement.</p>`;
+}
+function saveName() { const v = $('#s_name').value.trim(); if (!v) return toast('⚠️ Nom requis'); db.school = v; db.director = $('#s_dir').value.trim(); db.founded = $('#s_year').value.trim(); save(); applyTheme(); toast('✅ Informations enregistrées'); }
+function setTheme(t) { db.theme = t; save(); render(); }
+function clearDemo() {
+  confirmBox('Supprimer tous les élèves, classes et enseignants marqués « exemple » ? Vos propres données sont conservées.', () => {
+    db.students = db.students.filter(x => !x.demo); db.teachers = db.teachers.filter(x => !x.demo);
+    db.classes = db.classes.filter(x => !x.demo);
+    db.students.forEach(s => { if (!db.classes.some(c => c.id === s.classId)) s.classId = ''; });
+    db.teachers.forEach(t => { if (!db.classes.some(c => c.id === t.classId)) t.classId = ''; });
+    save(); toast('🧹 Démonstration supprimée'); render();
+  }, 'Supprimer');
+}
+function resetAll() {
+  confirmBox('Toutes vos données seront effacées et remplacées par les données d\'exemple. Cette action est irréversible.', () => {
+    const theme = db.theme; db = seed(); db.theme = theme; save(); toast('♻️ Application réinitialisée'); go('home');
+  }, 'Réinitialiser');
+}
+
+render();
+
+/* ---------- Application installable (PWA) ---------- */
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>
